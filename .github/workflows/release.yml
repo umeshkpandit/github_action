@@ -1,0 +1,39 @@
+# Final step: a pull request from develop is merged into main.
+# Other pulls into main do not run this job.
+
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'develop'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Check out the merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Test and build
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Publish the release
+        run: |
+          echo "Merged develop into main via PR #${{ github.event.pull_request.number }}"
+          echo "Title: ${{ github.event.pull_request.title }}"
+          echo "Production release:"
+          cat dist/release.txt

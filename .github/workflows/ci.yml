@@ -1,14 +1,14 @@
-# CI for the small Node app. Same ideas as the lessons:
-# a trigger, one job, steps, and a workflow env value.
+# CI for the small Node app.
+# One job, a workflow env value, and an npm cache via setup-node.
 # This workflow does not need any secrets.
 
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 env:
   NODE_ENV: test
@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         run: |

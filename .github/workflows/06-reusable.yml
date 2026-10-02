@@ -1,0 +1,20 @@
+# Lesson 6: call another workflow file instead of copying its steps.
+# The called file is reusable-node-test.yml in this same directory.
+
+name: 06 Reusable
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  node-20:
+    uses: ./.github/workflows/reusable-node-test.yml
+    with:
+      node-version: "20"
+
+  node-22:
+    uses: ./.github/workflows/reusable-node-test.yml
+    with:
+      node-version: "22"

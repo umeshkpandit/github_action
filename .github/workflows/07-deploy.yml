@@ -1,0 +1,65 @@
+# Lesson 7: a small release pipeline you start by hand.
+# The branch flow lives in develop-merge.yml and release.yml.
+# The build job uploads an artifact; deploy downloads it. The two jobs never
+# share a workspace, which is why the artifact step is required.
+
+name: 07 Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Where to deploy
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install, test, and build
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Upload the release file
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: dist/release.txt
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'staging' }}
+    steps:
+      - name: Download the release file
+        uses: actions/download-artifact@v4
+        with:
+          name: release
+
+      - name: Deploy
+        env:
+          TARGET: ${{ github.event_name == 'workflow_dispatch' && inputs.target || 'staging' }}
+        run: |
+          echo "Deploying to $TARGET"
+          echo "Release file:"
+          cat release.txt

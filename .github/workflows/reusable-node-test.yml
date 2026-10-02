@@ -1,0 +1,38 @@
+# Called by 06-reusable.yml. `workflow_call` is what makes a workflow reusable.
+# You can also start this file by hand; both triggers pass node-version.
+
+name: Reusable Node test
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to test
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      node-version:
+        description: Node.js version to test
+        required: true
+        default: "22"
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ inputs.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
