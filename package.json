@@ -1,0 +1,10 @@
+{
+  "name": "github-action-lessons",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "node --check src/greet.js && node --check src/greet.test.js",
+    "test": "node --test"
+  }
+}

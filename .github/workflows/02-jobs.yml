@@ -1,0 +1,27 @@
+# Lesson 2: a workflow can have more than one job.
+# Jobs run in parallel unless one lists the other under `needs`.
+# `report` waits until `setup` finishes successfully.
+
+name: 02 Jobs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write a value for this job
+        run: echo "setup-ok" > status.txt
+
+      - name: Show the value
+        run: cat status.txt
+
+  report:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Confirm setup finished first
+        run: echo "setup succeeded, so this job can run"
