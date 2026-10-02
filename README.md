@@ -27,6 +27,8 @@ Work lands on `develop` first. `main` is updated only by merging `develop`.
 2. Merge the pull request. [`.github/workflows/develop-merge.yml`](.github/workflows/develop-merge.yml) tests, builds, and records the result in the `staging` environment.
 3. Open a pull request from `develop` into `main` and merge it. [`.github/workflows/release.yml`](.github/workflows/release.yml) runs only for that merge and records the result in the `production` environment.
 
+A direct push to `develop` or `main` does not start those two workflows. They start when the pull request is merged.
+
 ## App CI
 
 [`src/greet.js`](src/greet.js) is a tiny Node module. [`scripts/build.js`](scripts/build.js) writes `dist/release.txt`. CI caches npm, installs Node 22, and runs `npm test`. It does not need a secret.
